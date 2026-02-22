@@ -138,7 +138,16 @@ class DailyRunTester:
                 successful_steps = sum(1 for step in steps if step.get('ok', False))
                 total_duration = result.get('durationMs', 0)
                 
-                details = f"RunId: {result.get('runId')}, Steps: {successful_steps}/10, Duration: {total_duration}ms"
+                # L4.2: Check AUTO_WARMUP step specifically
+                auto_warmup_step = next((s for s in steps if s.get('name') == 'AUTO_WARMUP'), None)
+                auto_warmup_details = ""
+                if auto_warmup_step and auto_warmup_step.get('details'):
+                    if auto_warmup_step['details'].get('started'):
+                        auto_warmup_details = f", AUTO_WARMUP: Started ({auto_warmup_step['details'].get('reason', 'Unknown reason')})"
+                    else:
+                        auto_warmup_details = f", AUTO_WARMUP: Skipped ({auto_warmup_step['details'].get('reason', 'Unknown reason')})"
+                
+                details = f"RunId: {result.get('runId')}, Steps: {successful_steps}/11, Duration: {total_duration}ms{auto_warmup_details}"
                 if lifecycle.get('transition'):
                     details += f", Transition: {lifecycle.get('transition')}"
                 
