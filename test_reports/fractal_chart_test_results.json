@@ -1,0 +1,135 @@
+{
+  "summary": "Fractal Chart Margin & Forecast Zone Testing",
+  "tests_passed": 16,
+  "tests_total": 21,
+  "success_rate": "76.2%",
+  "timestamp": "2026-02-22T14:38:22.946732",
+  "test_details": [
+    {
+      "test_name": "Focus Pack Scenario Data (7d)",
+      "passed": true,
+      "details": "Valid scenario with 3 cases: ['Base', 'Bear', 'Bull']",
+      "timestamp": "2026-02-22T14:38:21.142625"
+    },
+    {
+      "test_name": "Chart Unified Path Structure",
+      "passed": true,
+      "details": "Unified path with 8 points, horizon: 7d",
+      "timestamp": "2026-02-22T14:38:21.143342"
+    },
+    {
+      "test_name": "Standard Horizon Support",
+      "passed": true,
+      "details": "Horizon 7d within standard range",
+      "timestamp": "2026-02-22T14:38:21.143362"
+    },
+    {
+      "test_name": "Terminal API for RiskBox (7d)",
+      "passed": false,
+      "details": "API returned ok=false, error: Unknown error",
+      "timestamp": "2026-02-22T14:38:21.305708"
+    },
+    {
+      "test_name": "Focus Pack Scenario Data (30d)",
+      "passed": true,
+      "details": "Valid scenario with 3 cases: ['Base', 'Bear', 'Bull']",
+      "timestamp": "2026-02-22T14:38:21.571545"
+    },
+    {
+      "test_name": "Chart Unified Path Structure",
+      "passed": true,
+      "details": "Unified path with 31 points, horizon: 30d",
+      "timestamp": "2026-02-22T14:38:21.572239"
+    },
+    {
+      "test_name": "Standard Horizon Support",
+      "passed": true,
+      "details": "Horizon 30d within standard range",
+      "timestamp": "2026-02-22T14:38:21.572257"
+    },
+    {
+      "test_name": "Terminal API for RiskBox (30d)",
+      "passed": false,
+      "details": "API returned ok=false, error: Unknown error",
+      "timestamp": "2026-02-22T14:38:21.687504"
+    },
+    {
+      "test_name": "Focus Pack Scenario Data (90d)",
+      "passed": true,
+      "details": "Valid scenario with 3 cases: ['Base', 'Bear', 'Bull']",
+      "timestamp": "2026-02-22T14:38:21.927719"
+    },
+    {
+      "test_name": "Chart Unified Path Structure",
+      "passed": true,
+      "details": "Unified path with 91 points, horizon: 90d",
+      "timestamp": "2026-02-22T14:38:21.928424"
+    },
+    {
+      "test_name": "Standard Horizon Support",
+      "passed": true,
+      "details": "Horizon 90d within standard range",
+      "timestamp": "2026-02-22T14:38:21.928443"
+    },
+    {
+      "test_name": "Terminal API for RiskBox (90d)",
+      "passed": false,
+      "details": "API returned ok=false, error: Unknown error",
+      "timestamp": "2026-02-22T14:38:22.041046"
+    },
+    {
+      "test_name": "Focus Pack Scenario Data (180d)",
+      "passed": true,
+      "details": "Valid scenario with 3 cases: ['Base', 'Bear', 'Bull']",
+      "timestamp": "2026-02-22T14:38:22.270473"
+    },
+    {
+      "test_name": "Chart Unified Path Structure",
+      "passed": true,
+      "details": "Unified path with 181 points, horizon: 180d",
+      "timestamp": "2026-02-22T14:38:22.271410"
+    },
+    {
+      "test_name": "Long Horizon Support (180d+)",
+      "passed": true,
+      "details": "Horizon 180d supported for 420px forecast zone",
+      "timestamp": "2026-02-22T14:38:22.271431"
+    },
+    {
+      "test_name": "Terminal API for RiskBox (180d)",
+      "passed": false,
+      "details": "API returned ok=false, error: Unknown error",
+      "timestamp": "2026-02-22T14:38:22.426427"
+    },
+    {
+      "test_name": "Focus Pack Scenario Data (365d)",
+      "passed": true,
+      "details": "Valid scenario with 3 cases: ['Base', 'Bear', 'Bull']",
+      "timestamp": "2026-02-22T14:38:22.715461"
+    },
+    {
+      "test_name": "Chart Unified Path Structure",
+      "passed": true,
+      "details": "Unified path with 366 points, horizon: 365d",
+      "timestamp": "2026-02-22T14:38:22.716304"
+    },
+    {
+      "test_name": "Long Horizon Support (180d+)",
+      "passed": true,
+      "details": "Horizon 365d supported for 420px forecast zone",
+      "timestamp": "2026-02-22T14:38:22.716324"
+    },
+    {
+      "test_name": "Terminal API for RiskBox (365d)",
+      "passed": false,
+      "details": "API returned ok=false, error: Unknown error",
+      "timestamp": "2026-02-22T14:38:22.832457"
+    },
+    {
+      "test_name": "Invalid Focus Parameter",
+      "passed": true,
+      "details": "Correctly rejected invalid focus with status 400",
+      "timestamp": "2026-02-22T14:38:22.945854"
+    }
+  ]
+}
