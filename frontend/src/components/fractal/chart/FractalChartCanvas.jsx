@@ -368,7 +368,7 @@ export function FractalChartCanvas({
       canvas.removeEventListener("mouseleave", handleLeave);
       canvas.removeEventListener("click", handleClick);
     };
-  }, [chart, width, margins, phaseZones, phaseStats, onPhaseClick, selectedPhaseId]);
+  }, [chart, width, margins, phaseZones, phaseStats, onPhaseClick, selectedPhaseId, forecast, primaryMatch, horizonDays]);
 
   // Render
   useEffect(() => {
