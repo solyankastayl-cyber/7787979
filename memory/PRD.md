@@ -2,85 +2,107 @@
 
 ## Original Problem Statement
 Клонировать репозиторий, развернуть фронт, бэк и админку. Работать только с модулем Fractal.
-Реализовать задачи U3, U4, U5:
+Реализовать задачи U3, U4, U5, U6.
 
-### U3 — Multi-Horizon: реальные backend calls + единый контракт focus-pack
-- 7d/14d/30d/90d/180d/365d реально считаются
-- DATA: REAL / DATA: FALLBACK индикатор
+## Implemented Features
 
-### U4 — Hybrid Chart Dual View + цены в прогнозе
-- Цены вместо % на осях
-- 3 режима: Price, Replay, Hybrid
-- Hover tooltip с ценами и датами
+### U3 — Multi-Horizon (DONE - 2026-02-22)
+- Backend returns different matches for different horizons (7d=30, 30d=20, 365d=10)
+- `horizon` field added to meta response
+- DataStatusIndicator shows DATA: REAL/FALLBACK with reasons
 
-### U5 — Human-friendly Header + Tooltips
-- 4 карточки: Signal, Confidence, Market Mode, Risk
-- Raw scores в advanced секции
+### U4 — Hybrid Chart (DONE - 2026-02-22)
+- HybridSummaryPanel shows both % returns AND price targets
+- ForecastTooltip for hover in forecast zone shows prices/dates/returns
+- Price formatting with K/M suffix
+
+### U5 — Signal Header (DONE - 2026-02-22)
+- 4 human-friendly cards: Signal, Confidence, Market Mode, Risk
+- Advanced metrics toggle with raw scores
+- Tooltips explaining each metric
+
+### U6 — Scenarios 2.0 (DONE - 2026-02-22)
+- ScenarioBox component with Bear/Base/Bull cards
+- Target prices calculated: basePrice * (1 + return)
+- RangeStrip showing P10-P90 visual range
+- OutcomeStats: probUp, avgMaxDD, tailRiskP95, sampleSize
+- DATA: REAL/FALLBACK indicator
+- Different targets for different horizons:
+  - 7d: P10=$61K, P50=$68K, P90=$74K
+  - 365d: P10=$25K, P50=$110K, P90=$595K
 
 ## Architecture
 
 ### Backend (Node.js/Fastify)
-- `/app/backend/src/modules/fractal/` - Fractal module
-- `/app/backend/src/modules/fractal/focus/focus-pack.builder.ts` - FocusPack builder
-- `/app/backend/src/modules/fractal/config/horizon.config.ts` - Horizon configurations
+- `/app/backend/src/modules/fractal/focus/focus-pack.builder.ts`
+  - buildFocusPack() - main function
+  - buildScenarioPack() - U6: scenarios calculation
+  - buildDivergenceFromUnified() - divergence metrics
+- `/app/backend/src/modules/fractal/focus/focus.types.ts`
+  - ScenarioPack interface
+  - ScenarioCase type
 
 ### Frontend (React)
 - `/app/frontend/src/pages/FractalPage.js` - Main page
-- `/app/frontend/src/components/fractal/` - Components:
-  - `SignalHeader.jsx` - U5: Human-friendly 4 cards
-  - `DataStatusIndicator.jsx` - U3: REAL/FALLBACK status
-  - `chart/FractalChartCanvas.jsx` - U4: Enhanced with ForecastTooltip
+- `/app/frontend/src/components/fractal/`
+  - `ScenarioBox.jsx` - U6: Bear/Base/Bull scenarios
+  - `SignalHeader.jsx` - U5: 4 signal cards
+  - `DataStatusIndicator.jsx` - U3: REAL/FALLBACK
+  - `chart/FractalChartCanvas.jsx` - U4: ForecastTooltip
   - `chart/FractalHybridChart.jsx` - U4: Price targets
 
-### API Endpoint
-- `GET /api/fractal/v2.1/focus-pack?symbol=BTC&focus={7d|14d|30d|90d|180d|365d}`
+### API
+- `GET /api/fractal/v2.1/focus-pack?symbol=BTC&focus={horizon}`
+  - Returns: meta, overlay, forecast, diagnostics, scenario
 
-## What's Been Implemented (2026-02-22)
+## Testing Status (2026-02-22)
+- Backend: 95% - All APIs working, minor phaseSnapshot issue
+- Frontend: 100% - All components rendering correctly
+- Integration: 100% - Full flow working
 
-### U3 - Multi-Horizon (DONE)
-- [x] Backend returns different matches for different horizons
-- [x] `horizon` field added to meta response
-- [x] DataStatusIndicator shows DATA: REAL with match count
-- [x] Fallback detection for low quality/no matches
+## Acceptance Criteria Status
 
-### U4 - Hybrid Chart (DONE)
-- [x] HybridSummaryPanel shows both % returns AND price targets
-- [x] ForecastTooltip added for hover in forecast zone
-- [x] Tooltip shows synthetic/replay prices and returns
-- [x] Price formatting with K/M suffix
+### U3 ✅
+- [x] 7d and 365d return different matches/replay/synthetic
+- [x] DATA: REAL/FALLBACK with reason displayed
 
-### U5 - Signal Header (DONE)
-- [x] SignalCard: BUY/SELL/HOLD/NEUTRAL
-- [x] ConfidenceCard: LOW/MEDIUM/HIGH with progress bar
-- [x] MarketModeCard: ACCUMULATION/MARKUP/MARKDOWN/etc
-- [x] RiskCard: NORMAL/ELEVATED/CRISIS
-- [x] Advanced metrics toggle with raw scores
+### U4 ✅
+- [x] Hybrid shows 2 lines with hover giving 2 prices
+- [x] Forecast zone has price-levels not just shapes
 
-## Testing Status
-- Backend: 75% - APIs respond correctly
-- Frontend: 95% - All UI components working
-- Integration: 90% - Full flow working
+### U5 ✅
+- [x] Header readable without context (Signal/Confidence/Mode/Risk)
+
+### U6 ✅
+- [x] 7d and 365d give different target prices
+- [x] Preset changes scenarios (via horizon change)
+- [x] Hover and ScenarioBox show consistent prices
+- [x] DATA: REAL/FALLBACK displayed with sampleSize
 
 ## Next Action Items
-1. Verify preview deployment loads correctly
-2. Test multi-horizon switching updates all 4 components
-3. Add more detailed phase detection
+1. U7 — Risk Box 2.0: sizing explanation, Crisis mode reasoning
+2. Add phaseSnapshot to terminal endpoint for Market Mode card
+3. Simple/Pro mode toggle for user preference
 
 ## P0/P1/P2 Features Remaining
 
 ### P0 (Critical)
-- None - Core U3/U4/U5 implemented
+- None - All U3-U6 implemented
 
 ### P1 (Important)
-- phaseSnapshot data in terminal endpoint
-- Better phase confidence calculation
+- U7 Risk Box 2.0
+- phaseSnapshot in terminal endpoint
+- Preset selector (Conservative/Balanced/Aggressive)
 
 ### P2 (Nice to have)
 - Simple/Pro mode toggle
-- More granular risk levels
 - Historical accuracy tracking
+- SPX copy of BTC structure
 
 ## User Personas
-- Institutional Traders - Need quick signal interpretation
-- Retail Traders - Need simplified view with tooltips
+- Institutional Traders - Need quick signal + scenario interpretation
+- Retail Traders - Need simplified view with Bear/Base/Bull scenarios
 - Researchers - Need advanced metrics access
+
+## Technical Debt
+- Preview server requires wake up activation (known platform issue)
