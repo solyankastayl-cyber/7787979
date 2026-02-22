@@ -994,3 +994,49 @@ function buildScenarioPack(
   };
 }
 
+
+
+// ═══════════════════════════════════════════════════════════════
+// DIVERGENCE FROM UNIFIED PATH
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Build Divergence metrics from UnifiedPath
+ */
+function buildDivergenceFromUnified(
+  unifiedPath: UnifiedPath,
+  basePrice: number,
+  horizonDays: number,
+  tier: 'TIMING' | 'TACTICAL' | 'STRUCTURE',
+  mode: AxisMode
+): DivergenceMetrics {
+  // Use unified paths (skip t=0 for divergence calc)
+  const syntheticPath = unifiedPath.syntheticPath.slice(1).map(p => p.price);
+  const replayPath = unifiedPath.replayPath?.slice(1).map(p => p.price) || [];
+  
+  if (replayPath.length === 0 || syntheticPath.length === 0) {
+    return {
+      horizonDays,
+      mode,
+      rmse: 0,
+      mape: 0,
+      maxAbsDev: 0,
+      terminalDelta: 0,
+      directionalMismatch: 0,
+      corr: 1,
+      score: 100,
+      grade: 'A',
+      flags: [],
+      samplePoints: 0,
+    };
+  }
+  
+  return calculateDivergence(
+    syntheticPath,
+    replayPath,
+    basePrice,
+    horizonDays,
+    tier,
+    mode
+  );
+}
