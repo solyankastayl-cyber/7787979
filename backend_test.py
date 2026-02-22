@@ -321,7 +321,8 @@ class FractalAPITester:
         )
         
         if success and data:
-            scenario = data.get('scenario')
+            focus_pack = data.get('focusPack', data)  # Handle nested response
+            scenario = focus_pack.get('scenario')
             if not scenario:
                 self.issues.append("U6: Missing scenario object in focus-pack response")
                 return False, data
