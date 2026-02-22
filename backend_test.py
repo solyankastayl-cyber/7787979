@@ -152,8 +152,9 @@ class FractalAPITester:
         )
         
         if success and data:
-            matches_count = len(data.get('overlay', {}).get('matches', []))
-            diagnostics = data.get('diagnostics', {})
+            focus_pack = data.get('focusPack', data)
+            matches_count = len(focus_pack.get('overlay', {}).get('matches', []))
+            diagnostics = focus_pack.get('diagnostics', {})
             quality_score = diagnostics.get('qualityScore', 0)
             sample_size = diagnostics.get('sampleSize', 0)
             
