@@ -213,10 +213,16 @@ export function FractalChartCanvas({
   // BLOCK 73.5.1: Phase zones from chart
   const phaseZones = useMemo(() => chart?.phaseZones || [], [chart]);
   const phaseStats = useMemo(() => chart?.phaseStats || [], [chart]);
+  
+  // U4: Extract horizon days from focus
+  const horizonDays = useMemo(() => {
+    const match = focus?.match(/(\d+)d/);
+    return match ? parseInt(match[1]) : 30;
+  }, [focus]);
 
   // Mouse handler
 
-  // Mouse handler (BLOCK 73.5.1: Phase hover detection)
+  // Mouse handler (BLOCK 73.5.1: Phase hover detection + U4: Forecast zone hover)
   useEffect(() => {
     const canvas = ref.current;
     if (!canvas || !chart?.candles?.length) return;
@@ -229,6 +235,55 @@ export function FractalChartCanvas({
       const plotW = width - margins.left - margins.right;
       const step = plotW / (chart.candles.length - 1);
       const index = Math.round((mx - margins.left) / step);
+      
+      // U4: Calculate forecast zone boundaries
+      const xRightAnchor = margins.left + plotW;
+      const forecastZoneWidth = Math.min(plotW * 0.55, 380) - 70;
+
+      // U4: Check if cursor is in forecast zone
+      if (mx > xRightAnchor && mx < xRightAnchor + forecastZoneWidth && forecast) {
+        // Calculate which day in forecast we're hovering
+        const dayProgress = (mx - xRightAnchor) / forecastZoneWidth;
+        const day = Math.round(dayProgress * horizonDays);
+        
+        if (day >= 0 && day <= horizonDays) {
+          setForecastHoverDay(day);
+          setHoverIndex(null);
+          setHoveredPhase(null);
+          
+          // Get forecast data for this day
+          const unifiedPath = forecast?.unifiedPath;
+          const currentPrice = unifiedPath?.anchorPrice || forecast?.currentPrice;
+          
+          let syntheticPrice = null;
+          let replayPrice = null;
+          
+          if (unifiedPath?.syntheticPath?.length > day) {
+            syntheticPrice = unifiedPath.syntheticPath[day]?.price;
+          } else if (forecast?.pricePath?.length > day) {
+            syntheticPrice = day === 0 ? currentPrice : forecast.pricePath[day - 1];
+          }
+          
+          if (unifiedPath?.replayPath?.length > day) {
+            replayPrice = unifiedPath.replayPath[day]?.price;
+          } else if (primaryMatch?.replayPath?.length > day) {
+            replayPrice = day === 0 ? currentPrice : primaryMatch.replayPath[day - 1];
+          }
+          
+          setForecastHoverData({
+            syntheticPrice,
+            replayPrice,
+            p10: forecast?.p10Path?.[day],
+            p90: forecast?.p90Path?.[day]
+          });
+          
+          return;
+        }
+      }
+      
+      // Reset forecast hover when not in forecast zone
+      setForecastHoverDay(-1);
+      setForecastHoverData(null);
 
       if (index >= 0 && index < chart.candles.length) {
         setHoverIndex(index);
@@ -265,6 +320,8 @@ export function FractalChartCanvas({
     const handleLeave = () => {
       setHoverIndex(null);
       setHoveredPhase(null);
+      setForecastHoverDay(-1);
+      setForecastHoverData(null);
     };
     
     // BLOCK 73.5.2: Handle phase click
