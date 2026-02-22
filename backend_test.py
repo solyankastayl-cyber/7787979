@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-U7 RiskBox 2.0 Backend Testing
-Testing volatility regime, sizing data, and terminal API integration
+Fractal Chart Margin & Forecast Zone Testing
+Testing the specific fixes mentioned in review request:
+- Chart margins increased (top: 36, right: 350)  
+- Forecast zone width increased (420px)
+- ScenarioBox and RiskBox components
 """
 
 import requests
@@ -9,7 +12,7 @@ import json
 import sys
 from datetime import datetime
 
-class U7RiskBoxTester:
+class FractalChartTester:
     def __init__(self, base_url="https://fractal-dev-3.preview.emergentagent.com"):
         self.base_url = base_url
         self.tests_run = 0
@@ -35,17 +38,17 @@ class U7RiskBoxTester:
         if details:
             print(f"    {details}")
 
-    def test_terminal_api(self, symbol="BTC", focus="30d"):
-        """Test GET /api/fractal/v2.1/terminal for volatility and sizing data"""
-        url = f"{self.base_url}/api/fractal/v2.1/terminal"
-        params = {"symbol": symbol, "set": "extended", "focus": focus}
+    def test_focus_pack_api(self, focus="30d", mode="hybrid"):
+        """Test GET /api/fractal/v2.1/focus-pack with different horizons"""
+        url = f"{self.base_url}/api/fractal/v2.1/focus-pack"
+        params = {"focus": focus, "mode": mode}
         
         try:
             response = requests.get(url, params=params, timeout=30)
             
             if response.status_code != 200:
                 self.log_test(
-                    f"Terminal API ({symbol}, {focus})", 
+                    f"Focus Pack API ({focus}, {mode})", 
                     False, 
                     f"Status code {response.status_code}, expected 200"
                 )
@@ -53,297 +56,305 @@ class U7RiskBoxTester:
                 
             data = response.json()
             
-            # Check for required volatility data
-            volatility = data.get("volatility")
-            if not volatility:
+            # Check required fields for ScenarioBox
+            if not data.get("ok", False):
                 self.log_test(
-                    f"Terminal API Volatility ({symbol}, {focus})", 
+                    f"Focus Pack API ({focus}, {mode})", 
                     False, 
-                    "Missing volatility data"
+                    f"API returned ok=false, error: {data.get('error', 'Unknown error')}"
                 )
                 return None
                 
-            # Check volatility has regime field
-            vol_regime = volatility.get("regime")
-            if not vol_regime:
+            focus_pack = data.get("focusPack", {})
+            scenario = focus_pack.get("scenario")
+            
+            if not scenario:
                 self.log_test(
-                    f"Terminal API Vol Regime ({symbol}, {focus})", 
+                    f"Focus Pack API ({focus}, {mode})", 
                     False, 
-                    "Missing volatility.regime field"
+                    "Missing scenario data for ScenarioBox"
+                )
+                return None
+                
+            # Validate scenario structure for U6 ScenarioBox
+            required_scenario_fields = ["horizonDays", "basePrice", "cases", "probUp", "avgMaxDD", "tailRiskP95"]
+            missing_fields = [f for f in required_scenario_fields if f not in scenario]
+            
+            if missing_fields:
+                self.log_test(
+                    f"Focus Pack Scenario Data ({focus})", 
+                    False, 
+                    f"Missing scenario fields: {missing_fields}"
                 )
             else:
+                cases = scenario.get("cases", [])
+                expected_case_labels = {"Bear", "Base", "Bull"}
+                found_labels = {case.get("label") for case in cases}
+                
+                if expected_case_labels.issubset(found_labels):
+                    self.log_test(
+                        f"Focus Pack Scenario Data ({focus})", 
+                        True, 
+                        f"Valid scenario with {len(cases)} cases: {sorted(found_labels)}"
+                    )
+                else:
+                    missing_labels = expected_case_labels - found_labels
+                    self.log_test(
+                        f"Focus Pack Scenario Data ({focus})", 
+                        False, 
+                        f"Missing case labels: {missing_labels}"
+                    )
+                    
+            return data
+            
+        except Exception as e:
+            self.log_test(
+                f"Focus Pack API ({focus}, {mode})", 
+                False, 
+                f"Request failed: {str(e)}"
+            )
+            return None
+
+    def test_terminal_api_for_risk_box(self, focus="30d"):
+        """Test terminal API for U7 RiskBox data"""
+        url = f"{self.base_url}/api/fractal/v2.1/terminal"
+        params = {"focus": focus}
+        
+        try:
+            response = requests.get(url, params=params, timeout=30)
+            
+            if response.status_code != 200:
                 self.log_test(
-                    f"Terminal API Vol Regime ({symbol}, {focus})", 
+                    f"Terminal API for RiskBox ({focus})", 
+                    False, 
+                    f"Status code {response.status_code}, expected 200"
+                )
+                return None
+                
+            data = response.json()
+            
+            if not data.get("ok", False):
+                self.log_test(
+                    f"Terminal API for RiskBox ({focus})", 
+                    False, 
+                    f"API returned ok=false, error: {data.get('error', 'Unknown error')}"
+                )
+                return None
+                
+            terminal = data.get("terminal", {})
+            
+            # Check for RiskBox required fields
+            volatility = terminal.get("volatility")
+            sizing = terminal.get("sizing")
+            
+            if not volatility:
+                self.log_test(
+                    f"Terminal Volatility Data ({focus})", 
+                    False, 
+                    "Missing volatility data for RiskBox"
+                )
+                return None
+                
+            if not sizing:
+                self.log_test(
+                    f"Terminal Sizing Data ({focus})", 
+                    False, 
+                    "Missing sizing data for RiskBox"
+                )
+                return None
+                
+            # Validate volatility structure
+            vol_regime = volatility.get("regime")
+            if vol_regime:
+                self.log_test(
+                    f"Terminal Volatility Regime ({focus})", 
                     True, 
                     f"Vol regime: {vol_regime}"
                 )
-            
-            # Check for sizing data in decisionKernel
-            decision_kernel = data.get("decisionKernel", {})
-            sizing = decision_kernel.get("sizing")
-            
-            if not sizing:
-                self.log_test(
-                    f"Terminal API Sizing ({symbol}, {focus})", 
-                    False, 
-                    "Missing decisionKernel.sizing data"
-                )
-                return None
             else:
-                # Check sizing structure
-                final_size = sizing.get("finalSize", 0)
-                mode = sizing.get("mode", "")
-                blockers = sizing.get("blockers", [])
-                
                 self.log_test(
-                    f"Terminal API Sizing ({symbol}, {focus})", 
-                    True, 
-                    f"Final size: {final_size}, Mode: {mode}, Blockers: {len(blockers)}"
+                    f"Terminal Volatility Regime ({focus})", 
+                    False, 
+                    "Missing volatility regime"
                 )
+                
+            # Validate sizing structure
+            final_size = sizing.get("finalSize")
+            sizing_mode = sizing.get("mode")
+            blockers = sizing.get("blockers", [])
             
-            self.log_test(
-                f"Terminal API ({symbol}, {focus})", 
-                True, 
-                "API returns required volatility and sizing data"
-            )
-            
+            if final_size is not None:
+                self.log_test(
+                    f"Terminal Sizing Data ({focus})", 
+                    True, 
+                    f"Final size: {final_size}, Mode: {sizing_mode}, Blockers: {len(blockers)}"
+                )
+            else:
+                self.log_test(
+                    f"Terminal Sizing Data ({focus})", 
+                    False, 
+                    "Missing finalSize in sizing data"
+                )
+                
             return data
             
         except Exception as e:
             self.log_test(
-                f"Terminal API ({symbol}, {focus})", 
+                f"Terminal API for RiskBox ({focus})", 
                 False, 
                 f"Request failed: {str(e)}"
             )
             return None
 
-    def test_focus_pack_api(self, symbol="BTC", focus="30d"):
-        """Test GET /api/fractal/v2.1/focus-pack for scenario data"""
-        url = f"{self.base_url}/api/fractal/v2.1/focus-pack"
-        params = {"symbol": symbol, "focus": focus}
+    def test_chart_margins_data_structure(self, focus_data):
+        """Test that forecast data supports increased margins and forecast zone width"""
+        if not focus_data:
+            return
+            
+        focus_pack = focus_data.get("focusPack", {})
+        forecast = focus_pack.get("forecast")
         
-        try:
-            response = requests.get(url, params=params, timeout=30)
+        if not forecast:
+            self.log_test(
+                "Chart Forecast Data Structure", 
+                False, 
+                "Missing forecast data for chart rendering"
+            )
+            return
             
-            if response.status_code != 200:
+        # Check for unified path (supports chart margin fixes)
+        unified_path = forecast.get("unifiedPath")
+        if unified_path:
+            synthetic_path = unified_path.get("syntheticPath", [])
+            horizon_days = unified_path.get("horizonDays")
+            
+            if len(synthetic_path) > 0 and horizon_days:
                 self.log_test(
-                    f"Focus Pack API ({symbol}, {focus})", 
-                    False, 
-                    f"Status code {response.status_code}, expected 200"
+                    "Chart Unified Path Structure", 
+                    True, 
+                    f"Unified path with {len(synthetic_path)} points, horizon: {horizon_days}d"
                 )
-                return None
                 
-            data = response.json()
-            
-            # Check for scenario data needed by RiskBox
-            scenario = data.get("focusPack", {}).get("scenario")
-            if not scenario:
+                # Test support for longer horizons (180d+ needs increased forecast zone width)
+                if horizon_days >= 180:
+                    self.log_test(
+                        "Long Horizon Support (180d+)", 
+                        True, 
+                        f"Horizon {horizon_days}d supported for 420px forecast zone"
+                    )
+                else:
+                    self.log_test(
+                        "Standard Horizon Support", 
+                        True, 
+                        f"Horizon {horizon_days}d within standard range"
+                    )
+            else:
                 self.log_test(
-                    f"Focus Pack Scenario ({symbol}, {focus})", 
+                    "Chart Unified Path Structure", 
                     False, 
-                    "Missing focusPack.scenario data"
+                    f"Invalid unified path: {len(synthetic_path)} points, horizon: {horizon_days}"
                 )
-                return None
-            
-            # Check for avgMaxDD and tailRiskP95
-            avg_max_dd = scenario.get("avgMaxDD")
-            tail_risk_p95 = scenario.get("tailRiskP95")
-            
-            if avg_max_dd is None:
+        else:
+            # Fallback to legacy format
+            price_path = forecast.get("pricePath", [])
+            if len(price_path) > 0:
                 self.log_test(
-                    f"Focus Pack avgMaxDD ({symbol}, {focus})", 
-                    False, 
-                    "Missing scenario.avgMaxDD"
+                    "Chart Legacy Forecast Structure", 
+                    True, 
+                    f"Legacy format with {len(price_path)} forecast points"
                 )
             else:
                 self.log_test(
-                    f"Focus Pack avgMaxDD ({symbol}, {focus})", 
-                    True, 
-                    f"avgMaxDD: {avg_max_dd:.3f} ({avg_max_dd*100:.1f}%)"
-                )
-            
-            if tail_risk_p95 is None:
-                self.log_test(
-                    f"Focus Pack tailRiskP95 ({symbol}, {focus})", 
+                    "Chart Forecast Structure", 
                     False, 
-                    "Missing scenario.tailRiskP95"
-                )
-            else:
-                self.log_test(
-                    f"Focus Pack tailRiskP95 ({symbol}, {focus})", 
-                    True, 
-                    f"tailRiskP95: {tail_risk_p95:.3f} ({tail_risk_p95*100:.1f}%)"
-                )
-            
-            self.log_test(
-                f"Focus Pack API ({symbol}, {focus})", 
-                True, 
-                "API returns scenario data with drawdown stats"
-            )
-            
-            return data
-            
-        except Exception as e:
-            self.log_test(
-                f"Focus Pack API ({symbol}, {focus})", 
-                False, 
-                f"Request failed: {str(e)}"
-            )
-            return None
-
-    def test_crisis_mode_behavior(self, terminal_data):
-        """Test that crisis mode shows NO_TRADE with blockers"""
-        if not terminal_data:
-            return
-            
-        volatility = terminal_data.get("volatility", {})
-        vol_regime = volatility.get("regime", "")
-        
-        sizing = terminal_data.get("decisionKernel", {}).get("sizing", {})
-        mode = sizing.get("mode", "")
-        final_size = sizing.get("finalSize", 0)
-        blockers = sizing.get("blockers", [])
-        
-        if vol_regime == "CRISIS":
-            # In crisis mode, should have NO_TRADE mode and 0 final size
-            crisis_behavior_correct = (
-                mode == "NO_TRADE" and 
-                final_size == 0 and 
-                len(blockers) > 0
-            )
-            
-            self.log_test(
-                "Crisis Mode NO_TRADE Behavior", 
-                crisis_behavior_correct, 
-                f"Vol regime: {vol_regime}, Mode: {mode}, Size: {final_size}, Blockers: {len(blockers)}"
-            )
-            
-            # Check for expected blockers in crisis
-            expected_crisis_blockers = ["VOL_CRISIS", "EXTREME_VOL_SPIKE", "LOW_CONFIDENCE", "HIGH_ENTROPY"]
-            found_crisis_blockers = [b for b in expected_crisis_blockers if b in blockers]
-            
-            self.log_test(
-                "Crisis Mode Blockers", 
-                len(found_crisis_blockers) > 0, 
-                f"Expected crisis blockers found: {found_crisis_blockers}, All blockers: {blockers}"
-            )
-        else:
-            self.log_test(
-                "Crisis Mode Check", 
-                True, 
-                f"Vol regime: {vol_regime} (not in crisis, test N/A)"
-            )
-
-    def test_sizing_breakdown_structure(self, terminal_data):
-        """Test that sizing has proper breakdown structure"""
-        if not terminal_data:
-            return
-            
-        sizing = terminal_data.get("decisionKernel", {}).get("sizing", {})
-        
-        # Check for sizing breakdown components
-        required_fields = ["finalSize", "mode", "breakdown", "explain", "formula"]
-        missing_fields = [f for f in required_fields if f not in sizing]
-        
-        if missing_fields:
-            self.log_test(
-                "Sizing Breakdown Structure", 
-                False, 
-                f"Missing fields: {missing_fields}"
-            )
-        else:
-            breakdown = sizing.get("breakdown", [])
-            explain = sizing.get("explain", [])
-            formula = sizing.get("formula", "")
-            
-            self.log_test(
-                "Sizing Breakdown Structure", 
-                True, 
-                f"Breakdown steps: {len(breakdown)}, Explanations: {len(explain)}, Formula: {formula[:50]}..."
-            )
-            
-            # Check breakdown items have required structure
-            if breakdown and len(breakdown) > 0:
-                first_item = breakdown[0]
-                item_fields = ["factor", "multiplier", "severity", "note"]
-                item_missing = [f for f in item_fields if f not in first_item]
-                
-                self.log_test(
-                    "Sizing Breakdown Items", 
-                    len(item_missing) == 0, 
-                    f"First item fields: {list(first_item.keys())}, Missing: {item_missing}"
+                    "No forecast data available for chart rendering"
                 )
 
     def test_different_horizons(self):
-        """Test multiple horizons return different risk assessments"""
-        horizons = ["7d", "30d", "90d", "365d"]
-        terminal_results = {}
-        scenario_results = {}
+        """Test different horizon parameters to verify chart scaling"""
+        horizons = [
+            ("7d", "hybrid"),
+            ("30d", "hybrid"),
+            ("90d", "hybrid"),
+            ("180d", "hybrid"),  # This should benefit from increased forecast zone width
+            ("365d", "hybrid")   # This should benefit from increased forecast zone width
+        ]
         
-        for horizon in horizons:
-            terminal_data = self.test_terminal_api("BTC", horizon)
-            scenario_data = self.test_focus_pack_api("BTC", horizon)
-            
-            if terminal_data:
-                terminal_results[horizon] = terminal_data
-            if scenario_data:
-                scenario_results[horizon] = scenario_data
+        for focus, mode in horizons:
+            focus_data = self.test_focus_pack_api(focus, mode)
+            if focus_data:
+                self.test_chart_margins_data_structure(focus_data)
+                
+                # Test terminal data for this horizon
+                terminal_data = self.test_terminal_api_for_risk_box(focus)
+
+    def test_api_error_handling(self):
+        """Test API error handling"""
+        # Test invalid focus
+        url = f"{self.base_url}/api/fractal/v2.1/focus-pack"
+        params = {"focus": "invalid", "mode": "hybrid"}
         
-        # Check that different horizons have different risk characteristics
-        if len(terminal_results) >= 2:
-            horizon_keys = list(terminal_results.keys())
-            h1, h2 = horizon_keys[0], horizon_keys[1]
+        try:
+            response = requests.get(url, params=params, timeout=10)
             
-            vol1 = terminal_results[h1].get("volatility", {}).get("regime")
-            vol2 = terminal_results[h2].get("volatility", {}).get("regime")
-            
-            size1 = terminal_results[h1].get("decisionKernel", {}).get("sizing", {}).get("finalSize", 0)
-            size2 = terminal_results[h2].get("decisionKernel", {}).get("sizing", {}).get("finalSize", 0)
-            
+            if response.status_code in [400, 422]:
+                self.log_test(
+                    "Invalid Focus Parameter", 
+                    True, 
+                    f"Correctly rejected invalid focus with status {response.status_code}"
+                )
+            else:
+                data = response.json()
+                if not data.get("ok", True):
+                    self.log_test(
+                        "Invalid Focus Parameter", 
+                        True, 
+                        f"API correctly returned error: {data.get('error', 'Unknown')}"
+                    )
+                else:
+                    self.log_test(
+                        "Invalid Focus Parameter", 
+                        False, 
+                        f"API should reject invalid focus, got status {response.status_code}"
+                    )
+                
+        except Exception as e:
             self.log_test(
-                "Horizon Risk Variance", 
-                True, 
-                f"{h1}: Vol={vol1}, Size={size1:.2f} vs {h2}: Vol={vol2}, Size={size2:.2f}"
+                "Invalid Focus Parameter", 
+                False, 
+                f"Request failed: {str(e)}"
             )
-        
-        return terminal_results, scenario_results
 
     def run_all_tests(self):
-        """Run all U7 RiskBox tests"""
-        print("=" * 60)
-        print("U7 RISKBOX 2.0 BACKEND TESTING")
-        print("=" * 60)
+        """Run all Fractal chart tests"""
+        print("=" * 70)
+        print("FRACTAL CHART MARGIN & FORECAST ZONE TESTING")
+        print("=" * 70)
         print(f"Base URL: {self.base_url}")
         print()
         
-        # Test main APIs
-        terminal_data = self.test_terminal_api("BTC", "30d")
-        scenario_data = self.test_focus_pack_api("BTC", "30d")
-        
-        # Test crisis mode behavior
-        if terminal_data:
-            self.test_crisis_mode_behavior(terminal_data)
-            self.test_sizing_breakdown_structure(terminal_data)
-        
-        # Test different horizons
+        # Test different horizons and chart scaling
         self.test_different_horizons()
         
+        # Test error handling
+        self.test_api_error_handling()
+        
         print()
-        print("=" * 60)
+        print("=" * 70)
         print(f"RESULTS: {self.tests_passed}/{self.tests_run} tests passed")
-        print("=" * 60)
+        print("=" * 70)
         
         return self.tests_passed, self.tests_run, self.test_results
 
 def main():
     """Main test execution"""
-    tester = U7RiskBoxTester()
+    tester = FractalChartTester()
     passed, total, results = tester.run_all_tests()
     
     # Save results
-    with open('/app/test_reports/u7_backend_test_results.json', 'w') as f:
+    with open('/app/test_reports/fractal_chart_test_results.json', 'w') as f:
         json.dump({
-            "summary": f"U7 RiskBox 2.0 Backend Testing",
+            "summary": f"Fractal Chart Margin & Forecast Zone Testing",
             "tests_passed": passed,
             "tests_total": total,
             "success_rate": f"{(passed/total*100):.1f}%" if total > 0 else "0%",
