@@ -231,8 +231,9 @@ class FractalAPITester:
         )
         
         if success and data:
-            forecast = data.get('forecast', {})
-            unified_path = forecast.get('unifiedPath', {}) or data.get('unifiedPath', {})
+            focus_pack = data.get('focusPack', data)
+            forecast = focus_pack.get('forecast', {})
+            unified_path = forecast.get('unifiedPath', {}) or focus_pack.get('unifiedPath', {})
             
             # Check if unified path has the needed data for tooltips
             synthetic_path = unified_path.get('syntheticPath', [])
