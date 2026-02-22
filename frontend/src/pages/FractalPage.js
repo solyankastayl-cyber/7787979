@@ -316,8 +316,18 @@ const FractalTerminal = () => {
                 <FocusStatsBadge meta={meta} overlay={overlay} />
               )}
             </div>
-            <div className="text-xs text-slate-400">
-              v5 · Institutional Grade · BLOCK 70.2
+            <div className="flex items-center gap-3">
+              {/* BLOCK U2: As-of Date Picker */}
+              <AsOfDatePicker 
+                asOf={asOf}
+                mode={mode}
+                onAsOfChange={setAsOf}
+                onModeChange={setMode}
+                lastCandle={terminalData?.lastCandle || '2026-02-20'}
+              />
+              <div className="text-xs text-slate-400">
+                v6 · Institutional Grade
+              </div>
             </div>
           </div>
         </div>
