@@ -332,6 +332,9 @@ export interface FocusPack {
   
   // BLOCK 73.5.2: Phase Filter
   phaseFilter?: PhaseFilterInfo | null;
+  
+  // U6: Scenario Pack (unified scenarios for UI)
+  scenario?: ScenarioPack;
 }
 
 // ═══════════════════════════════════════════════════════════════
