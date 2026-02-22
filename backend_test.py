@@ -248,7 +248,7 @@ class FractalAPITester:
             else:
                 # Fallback to legacy structure
                 price_path = forecast.get('path', [])
-                primary_match = data.get('primarySelection', {}).get('primaryMatch', {})
+                primary_match = focus_pack.get('primarySelection', {}).get('primaryMatch', {})
                 replay_data = primary_match.get('aftermathNormalized', [])
                 
                 print(f"   Legacy price path length: {len(price_path)}")
