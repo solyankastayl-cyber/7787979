@@ -192,9 +192,11 @@ export async function buildFocusPack(
   // Build diagnostics
   const diagnostics = buildDiagnostics(matchResult, overlay, allCandles);
   
+  // U3: Add horizon to meta for frontend to track which horizon is active
   const meta: FocusPackMeta = {
     symbol,
     focus,
+    horizon: focus, // U3: Explicitly include horizon
     windowLen: cfg.windowLen,
     aftermathDays: cfg.aftermathDays,
     topK: cfg.topK,
