@@ -267,6 +267,7 @@ const FractalTerminal = () => {
     forecast,
     diagnostics,
     matchesCount,
+    scenario, // U6: Scenario pack
     // BLOCK 73.5.2: Phase filter controls
     phaseId,
     setPhaseId,
