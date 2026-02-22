@@ -1,13 +1,20 @@
 /**
  * UNIFIED LIFECYCLE ROUTES
  * 
- * BLOCK L1 — API endpoints for lifecycle management
+ * BLOCK L1 + L2 + L3 — API endpoints for lifecycle management
  */
 
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import mongoose from 'mongoose';
 import { getUnifiedLifecycleService } from './lifecycle.service.js';
-import { ModelId, LifecycleStatus } from './lifecycle.types.js';
+import { ModelId, LifecycleStatus, DriftSeverity } from './lifecycle.types.js';
+import { 
+  applyConstitutionHook, 
+  handleDriftUpdateHook, 
+  checkAutoPromotionHook,
+  incrementLiveSamplesHook 
+} from './lifecycle.hooks.js';
+import { assertActionAllowed, enforceIntegrity } from './lifecycle.integrity.js';
 
 // ═══════════════════════════════════════════════════════════════
 // ROUTES
@@ -23,6 +30,128 @@ export async function registerLifecycleRoutes(app: FastifyInstance): Promise<voi
   const service = getUnifiedLifecycleService(db);
   
   await service.ensureIndexes();
+  
+  // ═══════════════════════════════════════════════════════════════
+  // L3 ENDPOINTS — Constitution & Drift Hooks
+  // ═══════════════════════════════════════════════════════════════
+  
+  // POST /api/lifecycle/constitution/apply — L3.1 Constitution Binding
+  app.post<{
+    Body: { asset: ModelId; hash: string };
+  }>('/api/lifecycle/constitution/apply', async (req, reply) => {
+    try {
+      const { asset, hash } = req.body || {};
+      if (!asset || !hash) {
+        return reply.code(400).send({ ok: false, error: 'asset and hash required' });
+      }
+      
+      const currentState = await service.getState(asset);
+      if (!currentState) {
+        return reply.code(404).send({ ok: false, error: `Model ${asset} not found` });
+      }
+      
+      // Check if action allowed
+      const guard = assertActionAllowed(currentState, 'CONSTITUTION_APPLY', 'ADMIN');
+      if (!guard.allowed) {
+        return reply.code(403).send({ ok: false, error: guard.error });
+      }
+      
+      const result = await applyConstitutionHook(db, asset, hash, currentState);
+      const newState = await service.getState(asset);
+      
+      return { ok: true, data: { ...result, state: newState } };
+    } catch (err: any) {
+      return reply.code(500).send({ ok: false, error: err.message });
+    }
+  });
+  
+  // POST /api/lifecycle/drift/update — L3.2 Drift Update with Auto-Revoke
+  app.post<{
+    Body: { asset: ModelId; severity: DriftSeverity; deltaHitRate?: number; deltaSharpe?: number };
+  }>('/api/lifecycle/drift/update', async (req, reply) => {
+    try {
+      const { asset, severity, deltaHitRate, deltaSharpe } = req.body || {};
+      if (!asset || !severity) {
+        return reply.code(400).send({ ok: false, error: 'asset and severity required' });
+      }
+      
+      const result = await handleDriftUpdateHook(db, asset, severity, { deltaHitRate, deltaSharpe });
+      const newState = await service.getState(asset);
+      
+      return { ok: true, data: { ...result, state: newState } };
+    } catch (err: any) {
+      return reply.code(500).send({ ok: false, error: err.message });
+    }
+  });
+  
+  // POST /api/lifecycle/samples/increment — L3.5 Increment Live Samples
+  app.post<{
+    Body: { asset: ModelId; count?: number };
+  }>('/api/lifecycle/samples/increment', async (req, reply) => {
+    try {
+      const { asset, count } = req.body || {};
+      if (!asset) {
+        return reply.code(400).send({ ok: false, error: 'asset required' });
+      }
+      
+      const result = await incrementLiveSamplesHook(db, asset, count || 1);
+      const newState = await service.getState(asset);
+      
+      return { ok: true, data: { ...result, state: newState } };
+    } catch (err: any) {
+      return reply.code(500).send({ ok: false, error: err.message });
+    }
+  });
+  
+  // POST /api/lifecycle/check-promotion — L3.5 Check Auto-Promotion
+  app.post<{
+    Body: { asset: ModelId };
+  }>('/api/lifecycle/check-promotion', async (req, reply) => {
+    try {
+      const { asset } = req.body || {};
+      if (!asset) {
+        return reply.code(400).send({ ok: false, error: 'asset required' });
+      }
+      
+      const result = await checkAutoPromotionHook(db, asset);
+      const newState = await service.getState(asset);
+      
+      return { ok: true, data: { ...result, state: newState } };
+    } catch (err: any) {
+      return reply.code(500).send({ ok: false, error: err.message });
+    }
+  });
+  
+  // POST /api/lifecycle/integrity/check — L3.4 Integrity Check
+  app.post<{
+    Body: { asset: ModelId };
+  }>('/api/lifecycle/integrity/check', async (req, reply) => {
+    try {
+      const { asset } = req.body || {};
+      if (!asset) {
+        return reply.code(400).send({ ok: false, error: 'asset required' });
+      }
+      
+      const currentState = await service.getState(asset);
+      if (!currentState) {
+        return reply.code(404).send({ ok: false, error: `Model ${asset} not found` });
+      }
+      
+      const integrityResult = enforceIntegrity(null, currentState);
+      
+      // If fixes needed, apply them
+      if (!integrityResult.valid) {
+        await service.updateState(asset, integrityResult.state);
+        await service.addEvent(asset, 'STATE_AUTOFIX' as any, 'SYSTEM', { fixes: integrityResult.fixes });
+      }
+      
+      const newState = await service.getState(asset);
+      
+      return { ok: true, data: { integrityResult, state: newState } };
+    } catch (err: any) {
+      return reply.code(500).send({ ok: false, error: err.message });
+    }
+  });
   
   // ═══════════════════════════════════════════════════════════════
   // L2 ENDPOINTS — Lifecycle Observability
