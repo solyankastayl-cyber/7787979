@@ -70,8 +70,8 @@ export function drawHybridForecast(
     return; // No data to render
   }
   
-  // Forecast zone width
-  const forecastZoneWidth = Math.min(plotW * 0.55, 380) - 70;
+  // Forecast zone width (increased for longer horizons like 180d/365d)
+  const forecastZoneWidth = Math.min(plotW * 0.55, 420) - 50;
   const dayToX = (t) => xRightAnchor + (t / N) * forecastZoneWidth;
   
   // === 1. FORECAST ZONE BACKGROUND ===
