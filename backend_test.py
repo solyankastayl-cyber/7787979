@@ -400,8 +400,10 @@ class FractalAPITester:
         )
         
         if success_7d and success_365d:
-            scenario_7d = data_7d.get('scenario', {})
-            scenario_365d = data_365d.get('scenario', {})
+            focus_pack_7d = data_7d.get('focusPack', data_7d)
+            focus_pack_365d = data_365d.get('focusPack', data_365d)
+            scenario_7d = focus_pack_7d.get('scenario', {})
+            scenario_365d = focus_pack_365d.get('scenario', {})
             
             if not scenario_7d or not scenario_365d:
                 self.issues.append("U6: Missing scenario data in horizon responses")
