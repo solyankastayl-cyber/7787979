@@ -1,12 +1,14 @@
 /**
  * BLOCK 70.2 STEP 2 — useFocusPack Hook
  * BLOCK 73.5.2 — Phase Filter Support
+ * BLOCK U2 — As-of Date + Simulation Mode
  * 
  * Real horizon binding for frontend.
  * - AbortController for request cancellation
  * - Caches last good payload
  * - Loading/error states
  * - Phase filtering support
+ * - As-of date support for simulation mode
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -44,21 +46,26 @@ export const getTierLabel = (tier) => {
 /**
  * useFocusPack - Fetches focus-specific terminal data
  * BLOCK 73.5.2: Added phaseId parameter for phase filtering
+ * BLOCK U2: Added asOf parameter for simulation mode
  * 
  * @param {string} symbol - Trading symbol (BTC)
  * @param {string} focus - Horizon focus ('7d'|'14d'|'30d'|'90d'|'180d'|'365d')
- * @param {string|null} phaseId - Optional phase filter
- * @returns {{ data, loading, error, refetch, setPhaseId }}
+ * @param {object} options - { phaseId, asOf, mode }
+ * @returns {{ data, loading, error, refetch, setPhaseId, setAsOf }}
  */
-export function useFocusPack(symbol = 'BTC', focus = '30d', initialPhaseId = null) {
+export function useFocusPack(symbol = 'BTC', focus = '30d', options = {}) {
+  const { initialPhaseId = null, initialAsOf = null } = options;
+  
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [phaseId, setPhaseId] = useState(initialPhaseId);
+  const [phaseId, setPhaseIdState] = useState(initialPhaseId);
+  const [asOf, setAsOfState] = useState(initialAsOf); // BLOCK U2: As-of date
+  const [mode, setMode] = useState('auto'); // 'auto' = live, 'simulation' = historical
   const abortControllerRef = useRef(null);
   const cacheRef = useRef({}); // Cache by focus key
   
-  const fetchFocusPack = useCallback(async (overridePhaseId) => {
+  const fetchFocusPack = useCallback(async (overridePhaseId, overrideAsOf) => {
     // Abort previous request
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
@@ -68,9 +75,10 @@ export function useFocusPack(symbol = 'BTC', focus = '30d', initialPhaseId = nul
     const { signal } = abortControllerRef.current;
     
     const currentPhaseId = overridePhaseId !== undefined ? overridePhaseId : phaseId;
+    const currentAsOf = overrideAsOf !== undefined ? overrideAsOf : asOf;
     
     // Check cache first (only for non-filtered requests)
-    const cacheKey = `${symbol}_${focus}_${currentPhaseId || 'all'}`;
+    const cacheKey = `${symbol}_${focus}_${currentPhaseId || 'all'}_${currentAsOf || 'latest'}`;
     if (cacheRef.current[cacheKey] && !currentPhaseId) {
       setData(cacheRef.current[cacheKey]);
       // Still fetch fresh data in background
