@@ -1,8 +1,10 @@
 /**
- * L4.1 — Daily Run Lifecycle Integration
+ * L4.1 + L4.2 — Daily Run Lifecycle Integration
  * 
  * Single point where all lifecycle transitions happen.
  * Called ONLY from daily-run orchestrator.
+ * 
+ * L4.2: Auto Warmup Starter
  */
 
 import { Db } from 'mongodb';
@@ -36,6 +38,101 @@ export async function getLifecycleSnapshot(
     driftSeverity: state.drift?.severity || 'OK',
     constitutionHash: state.constitutionHash || null,
   };
+}
+
+// ═══════════════════════════════════════════════════════════════
+// L4.2 — AUTO WARMUP STARTER
+// ═══════════════════════════════════════════════════════════════
+
+export interface AutoWarmupResult {
+  started: boolean;
+  reason: string;
+  blocked?: string;
+}
+
+/**
+ * Auto-start warmup in PROD if:
+ * - systemMode === PROD
+ * - status === SIMULATION
+ * - liveSamples > 0 (есть live candles)
+ * - constitutionHash exists
+ * - drift != CRITICAL
+ */
+export async function runAutoWarmupStarter(
+  db: Db,
+  ctx: DailyRunContext
+): Promise<AutoWarmupResult> {
+  const stateCollection = db.collection('model_lifecycle_state');
+  const eventsCollection = db.collection('model_lifecycle_events');
+  
+  const state = await stateCollection.findOne({ modelId: ctx.asset });
+  if (!state) {
+    return { started: false, reason: 'State not found' };
+  }
+  
+  // Check conditions
+  if (state.systemMode !== 'PROD') {
+    return { started: false, reason: 'Not in PROD mode (DEV never auto-starts warmup)' };
+  }
+  
+  if (state.status !== 'SIMULATION') {
+    return { started: false, reason: `Already in ${state.status}` };
+  }
+  
+  const liveSamples = state.live?.liveSamples || 0;
+  if (liveSamples === 0) {
+    return { started: false, reason: 'No live candles yet' };
+  }
+  
+  if (!state.constitutionHash) {
+    return { started: false, reason: 'No constitution hash', blocked: 'CONSTITUTION_MISSING' };
+  }
+  
+  const driftSeverity = state.drift?.severity || 'OK';
+  if (driftSeverity === 'CRITICAL') {
+    return { started: false, reason: 'Drift CRITICAL blocks auto-warmup', blocked: 'DRIFT_CRITICAL' };
+  }
+  
+  // All checks passed — start warmup
+  const now = ctx.now.toISOString();
+  
+  await stateCollection.updateOne(
+    { modelId: ctx.asset },
+    {
+      $set: {
+        status: 'WARMUP',
+        warmup: {
+          startedAt: now,
+          targetDays: 30,
+          resolvedDays: 0,
+          progressPct: 0,
+        },
+        updatedAt: now,
+      },
+    }
+  );
+  
+  await eventsCollection.insertOne({
+    modelId: ctx.asset,
+    engineVersion: 'v2.1',
+    ts: now,
+    type: 'AUTO_WARMUP_STARTED',
+    actor: 'SYSTEM',
+    meta: {
+      previousStatus: 'SIMULATION',
+      newStatus: 'WARMUP',
+      liveSamples,
+      constitutionHash: state.constitutionHash,
+      reason: 'PROD detected + live candles available',
+    },
+  });
+  
+  ctx.logs.push(`[AutoWarmup] Started warmup for ${ctx.asset} (${liveSamples} live samples)`);
+  ctx.warnings.push(`${ctx.asset} auto-started warmup (PROD mode)`);
+  
+  console.log(`[Lifecycle] ${ctx.asset} auto-started warmup in PROD mode`);
+  
+  return { started: true, reason: 'PROD + SIMULATION + live candles → WARMUP' };
 }
 
 // ═══════════════════════════════════════════════════════════════
