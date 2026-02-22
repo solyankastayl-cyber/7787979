@@ -1,135 +1,165 @@
 {
   "summary": "Fractal Chart Margin & Forecast Zone Testing",
-  "tests_passed": 16,
-  "tests_total": 21,
-  "success_rate": "76.2%",
-  "timestamp": "2026-02-22T14:38:22.946732",
+  "tests_passed": 26,
+  "tests_total": 26,
+  "success_rate": "100.0%",
+  "timestamp": "2026-02-22T14:38:46.433684",
   "test_details": [
     {
       "test_name": "Focus Pack Scenario Data (7d)",
       "passed": true,
       "details": "Valid scenario with 3 cases: ['Base', 'Bear', 'Bull']",
-      "timestamp": "2026-02-22T14:38:21.142625"
+      "timestamp": "2026-02-22T14:38:44.737032"
     },
     {
       "test_name": "Chart Unified Path Structure",
       "passed": true,
       "details": "Unified path with 8 points, horizon: 7d",
-      "timestamp": "2026-02-22T14:38:21.143342"
+      "timestamp": "2026-02-22T14:38:44.737686"
     },
     {
       "test_name": "Standard Horizon Support",
       "passed": true,
       "details": "Horizon 7d within standard range",
-      "timestamp": "2026-02-22T14:38:21.143362"
+      "timestamp": "2026-02-22T14:38:44.737704"
     },
     {
-      "test_name": "Terminal API for RiskBox (7d)",
-      "passed": false,
-      "details": "API returned ok=false, error: Unknown error",
-      "timestamp": "2026-02-22T14:38:21.305708"
+      "test_name": "Terminal Volatility Regime (7d)",
+      "passed": true,
+      "details": "Vol regime: CRISIS",
+      "timestamp": "2026-02-22T14:38:44.886356"
+    },
+    {
+      "test_name": "Terminal Sizing Data (7d)",
+      "passed": true,
+      "details": "Final size: 0, Mode: NO_TRADE, Blockers: 4",
+      "timestamp": "2026-02-22T14:38:44.886384"
     },
     {
       "test_name": "Focus Pack Scenario Data (30d)",
       "passed": true,
       "details": "Valid scenario with 3 cases: ['Base', 'Bear', 'Bull']",
-      "timestamp": "2026-02-22T14:38:21.571545"
+      "timestamp": "2026-02-22T14:38:45.071115"
     },
     {
       "test_name": "Chart Unified Path Structure",
       "passed": true,
       "details": "Unified path with 31 points, horizon: 30d",
-      "timestamp": "2026-02-22T14:38:21.572239"
+      "timestamp": "2026-02-22T14:38:45.071798"
     },
     {
       "test_name": "Standard Horizon Support",
       "passed": true,
       "details": "Horizon 30d within standard range",
-      "timestamp": "2026-02-22T14:38:21.572257"
+      "timestamp": "2026-02-22T14:38:45.071817"
     },
     {
-      "test_name": "Terminal API for RiskBox (30d)",
-      "passed": false,
-      "details": "API returned ok=false, error: Unknown error",
-      "timestamp": "2026-02-22T14:38:21.687504"
+      "test_name": "Terminal Volatility Regime (30d)",
+      "passed": true,
+      "details": "Vol regime: CRISIS",
+      "timestamp": "2026-02-22T14:38:45.204239"
+    },
+    {
+      "test_name": "Terminal Sizing Data (30d)",
+      "passed": true,
+      "details": "Final size: 0, Mode: NO_TRADE, Blockers: 4",
+      "timestamp": "2026-02-22T14:38:45.204266"
     },
     {
       "test_name": "Focus Pack Scenario Data (90d)",
       "passed": true,
       "details": "Valid scenario with 3 cases: ['Base', 'Bear', 'Bull']",
-      "timestamp": "2026-02-22T14:38:21.927719"
+      "timestamp": "2026-02-22T14:38:45.431066"
     },
     {
       "test_name": "Chart Unified Path Structure",
       "passed": true,
       "details": "Unified path with 91 points, horizon: 90d",
-      "timestamp": "2026-02-22T14:38:21.928424"
+      "timestamp": "2026-02-22T14:38:45.431832"
     },
     {
       "test_name": "Standard Horizon Support",
       "passed": true,
       "details": "Horizon 90d within standard range",
-      "timestamp": "2026-02-22T14:38:21.928443"
+      "timestamp": "2026-02-22T14:38:45.431852"
     },
     {
-      "test_name": "Terminal API for RiskBox (90d)",
-      "passed": false,
-      "details": "API returned ok=false, error: Unknown error",
-      "timestamp": "2026-02-22T14:38:22.041046"
+      "test_name": "Terminal Volatility Regime (90d)",
+      "passed": true,
+      "details": "Vol regime: CRISIS",
+      "timestamp": "2026-02-22T14:38:45.591509"
+    },
+    {
+      "test_name": "Terminal Sizing Data (90d)",
+      "passed": true,
+      "details": "Final size: 0, Mode: NO_TRADE, Blockers: 4",
+      "timestamp": "2026-02-22T14:38:45.591542"
     },
     {
       "test_name": "Focus Pack Scenario Data (180d)",
       "passed": true,
       "details": "Valid scenario with 3 cases: ['Base', 'Bear', 'Bull']",
-      "timestamp": "2026-02-22T14:38:22.270473"
+      "timestamp": "2026-02-22T14:38:45.836697"
     },
     {
       "test_name": "Chart Unified Path Structure",
       "passed": true,
       "details": "Unified path with 181 points, horizon: 180d",
-      "timestamp": "2026-02-22T14:38:22.271410"
+      "timestamp": "2026-02-22T14:38:45.837454"
     },
     {
       "test_name": "Long Horizon Support (180d+)",
       "passed": true,
       "details": "Horizon 180d supported for 420px forecast zone",
-      "timestamp": "2026-02-22T14:38:22.271431"
+      "timestamp": "2026-02-22T14:38:45.837471"
     },
     {
-      "test_name": "Terminal API for RiskBox (180d)",
-      "passed": false,
-      "details": "API returned ok=false, error: Unknown error",
-      "timestamp": "2026-02-22T14:38:22.426427"
+      "test_name": "Terminal Volatility Regime (180d)",
+      "passed": true,
+      "details": "Vol regime: CRISIS",
+      "timestamp": "2026-02-22T14:38:45.977893"
+    },
+    {
+      "test_name": "Terminal Sizing Data (180d)",
+      "passed": true,
+      "details": "Final size: 0, Mode: NO_TRADE, Blockers: 4",
+      "timestamp": "2026-02-22T14:38:45.977924"
     },
     {
       "test_name": "Focus Pack Scenario Data (365d)",
       "passed": true,
       "details": "Valid scenario with 3 cases: ['Base', 'Bear', 'Bull']",
-      "timestamp": "2026-02-22T14:38:22.715461"
+      "timestamp": "2026-02-22T14:38:46.204152"
     },
     {
       "test_name": "Chart Unified Path Structure",
       "passed": true,
       "details": "Unified path with 366 points, horizon: 365d",
-      "timestamp": "2026-02-22T14:38:22.716304"
+      "timestamp": "2026-02-22T14:38:46.205088"
     },
     {
       "test_name": "Long Horizon Support (180d+)",
       "passed": true,
       "details": "Horizon 365d supported for 420px forecast zone",
-      "timestamp": "2026-02-22T14:38:22.716324"
+      "timestamp": "2026-02-22T14:38:46.205108"
     },
     {
-      "test_name": "Terminal API for RiskBox (365d)",
-      "passed": false,
-      "details": "API returned ok=false, error: Unknown error",
-      "timestamp": "2026-02-22T14:38:22.832457"
+      "test_name": "Terminal Volatility Regime (365d)",
+      "passed": true,
+      "details": "Vol regime: CRISIS",
+      "timestamp": "2026-02-22T14:38:46.328921"
+    },
+    {
+      "test_name": "Terminal Sizing Data (365d)",
+      "passed": true,
+      "details": "Final size: 0, Mode: NO_TRADE, Blockers: 4",
+      "timestamp": "2026-02-22T14:38:46.328954"
     },
     {
       "test_name": "Invalid Focus Parameter",
       "passed": true,
       "details": "Correctly rejected invalid focus with status 400",
-      "timestamp": "2026-02-22T14:38:22.945854"
+      "timestamp": "2026-02-22T14:38:46.432769"
     }
   ]
 }
