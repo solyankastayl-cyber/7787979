@@ -1,0 +1,219 @@
+{
+  "summary": "U7 RiskBox 2.0 Backend Testing",
+  "tests_passed": 35,
+  "tests_total": 35,
+  "success_rate": "100.0%",
+  "timestamp": "2026-02-22T14:01:19.325341",
+  "test_details": [
+    {
+      "test_name": "Terminal API Vol Regime (BTC, 30d)",
+      "passed": true,
+      "details": "Vol regime: CRISIS",
+      "timestamp": "2026-02-22T14:01:17.731241"
+    },
+    {
+      "test_name": "Terminal API Sizing (BTC, 30d)",
+      "passed": true,
+      "details": "Final size: 0, Mode: NO_TRADE, Blockers: 4",
+      "timestamp": "2026-02-22T14:01:17.731269"
+    },
+    {
+      "test_name": "Terminal API (BTC, 30d)",
+      "passed": true,
+      "details": "API returns required volatility and sizing data",
+      "timestamp": "2026-02-22T14:01:17.731274"
+    },
+    {
+      "test_name": "Focus Pack avgMaxDD (BTC, 30d)",
+      "passed": true,
+      "details": "avgMaxDD: 0.167 (16.7%)",
+      "timestamp": "2026-02-22T14:01:17.974707"
+    },
+    {
+      "test_name": "Focus Pack tailRiskP95 (BTC, 30d)",
+      "passed": true,
+      "details": "tailRiskP95: -0.298 (-29.8%)",
+      "timestamp": "2026-02-22T14:01:17.974735"
+    },
+    {
+      "test_name": "Focus Pack API (BTC, 30d)",
+      "passed": true,
+      "details": "API returns scenario data with drawdown stats",
+      "timestamp": "2026-02-22T14:01:17.974740"
+    },
+    {
+      "test_name": "Crisis Mode NO_TRADE Behavior",
+      "passed": true,
+      "details": "Vol regime: CRISIS, Mode: NO_TRADE, Size: 0, Blockers: 4",
+      "timestamp": "2026-02-22T14:01:17.975364"
+    },
+    {
+      "test_name": "Crisis Mode Blockers",
+      "passed": true,
+      "details": "Expected crisis blockers found: ['VOL_CRISIS', 'EXTREME_VOL_SPIKE', 'LOW_CONFIDENCE', 'HIGH_ENTROPY'], All blockers: ['LOW_CONFIDENCE', 'HIGH_ENTROPY', 'VOL_CRISIS', 'EXTREME_VOL_SPIKE']",
+      "timestamp": "2026-02-22T14:01:17.975390"
+    },
+    {
+      "test_name": "Sizing Breakdown Structure",
+      "passed": true,
+      "details": "Breakdown steps: 5, Explanations: 2, Formula: 0.35 \u00d7 0.00 \u00d7 0.00 \u00d7 0.00 \u00d7 0.25...",
+      "timestamp": "2026-02-22T14:01:17.975402"
+    },
+    {
+      "test_name": "Sizing Breakdown Items",
+      "passed": true,
+      "details": "First item fields: ['factor', 'order', 'multiplier', 'note', 'severity'], Missing: []",
+      "timestamp": "2026-02-22T14:01:17.975412"
+    },
+    {
+      "test_name": "Terminal API Vol Regime (BTC, 7d)",
+      "passed": true,
+      "details": "Vol regime: CRISIS",
+      "timestamp": "2026-02-22T14:01:18.117746"
+    },
+    {
+      "test_name": "Terminal API Sizing (BTC, 7d)",
+      "passed": true,
+      "details": "Final size: 0, Mode: NO_TRADE, Blockers: 4",
+      "timestamp": "2026-02-22T14:01:18.117775"
+    },
+    {
+      "test_name": "Terminal API (BTC, 7d)",
+      "passed": true,
+      "details": "API returns required volatility and sizing data",
+      "timestamp": "2026-02-22T14:01:18.117780"
+    },
+    {
+      "test_name": "Focus Pack avgMaxDD (BTC, 7d)",
+      "passed": true,
+      "details": "avgMaxDD: 0.058 (5.8%)",
+      "timestamp": "2026-02-22T14:01:18.302603"
+    },
+    {
+      "test_name": "Focus Pack tailRiskP95 (BTC, 7d)",
+      "passed": true,
+      "details": "tailRiskP95: -0.137 (-13.7%)",
+      "timestamp": "2026-02-22T14:01:18.302631"
+    },
+    {
+      "test_name": "Focus Pack API (BTC, 7d)",
+      "passed": true,
+      "details": "API returns scenario data with drawdown stats",
+      "timestamp": "2026-02-22T14:01:18.302636"
+    },
+    {
+      "test_name": "Terminal API Vol Regime (BTC, 30d)",
+      "passed": true,
+      "details": "Vol regime: CRISIS",
+      "timestamp": "2026-02-22T14:01:18.441577"
+    },
+    {
+      "test_name": "Terminal API Sizing (BTC, 30d)",
+      "passed": true,
+      "details": "Final size: 0, Mode: NO_TRADE, Blockers: 4",
+      "timestamp": "2026-02-22T14:01:18.441607"
+    },
+    {
+      "test_name": "Terminal API (BTC, 30d)",
+      "passed": true,
+      "details": "API returns required volatility and sizing data",
+      "timestamp": "2026-02-22T14:01:18.441613"
+    },
+    {
+      "test_name": "Focus Pack avgMaxDD (BTC, 30d)",
+      "passed": true,
+      "details": "avgMaxDD: 0.167 (16.7%)",
+      "timestamp": "2026-02-22T14:01:18.635870"
+    },
+    {
+      "test_name": "Focus Pack tailRiskP95 (BTC, 30d)",
+      "passed": true,
+      "details": "tailRiskP95: -0.298 (-29.8%)",
+      "timestamp": "2026-02-22T14:01:18.635902"
+    },
+    {
+      "test_name": "Focus Pack API (BTC, 30d)",
+      "passed": true,
+      "details": "API returns scenario data with drawdown stats",
+      "timestamp": "2026-02-22T14:01:18.635908"
+    },
+    {
+      "test_name": "Terminal API Vol Regime (BTC, 90d)",
+      "passed": true,
+      "details": "Vol regime: CRISIS",
+      "timestamp": "2026-02-22T14:01:18.775053"
+    },
+    {
+      "test_name": "Terminal API Sizing (BTC, 90d)",
+      "passed": true,
+      "details": "Final size: 0, Mode: NO_TRADE, Blockers: 4",
+      "timestamp": "2026-02-22T14:01:18.775086"
+    },
+    {
+      "test_name": "Terminal API (BTC, 90d)",
+      "passed": true,
+      "details": "API returns required volatility and sizing data",
+      "timestamp": "2026-02-22T14:01:18.775092"
+    },
+    {
+      "test_name": "Focus Pack avgMaxDD (BTC, 90d)",
+      "passed": true,
+      "details": "avgMaxDD: 0.261 (26.1%)",
+      "timestamp": "2026-02-22T14:01:18.984808"
+    },
+    {
+      "test_name": "Focus Pack tailRiskP95 (BTC, 90d)",
+      "passed": true,
+      "details": "tailRiskP95: -0.505 (-50.5%)",
+      "timestamp": "2026-02-22T14:01:18.984845"
+    },
+    {
+      "test_name": "Focus Pack API (BTC, 90d)",
+      "passed": true,
+      "details": "API returns scenario data with drawdown stats",
+      "timestamp": "2026-02-22T14:01:18.984850"
+    },
+    {
+      "test_name": "Terminal API Vol Regime (BTC, 365d)",
+      "passed": true,
+      "details": "Vol regime: CRISIS",
+      "timestamp": "2026-02-22T14:01:19.110671"
+    },
+    {
+      "test_name": "Terminal API Sizing (BTC, 365d)",
+      "passed": true,
+      "details": "Final size: 0, Mode: NO_TRADE, Blockers: 4",
+      "timestamp": "2026-02-22T14:01:19.110703"
+    },
+    {
+      "test_name": "Terminal API (BTC, 365d)",
+      "passed": true,
+      "details": "API returns required volatility and sizing data",
+      "timestamp": "2026-02-22T14:01:19.110708"
+    },
+    {
+      "test_name": "Focus Pack avgMaxDD (BTC, 365d)",
+      "passed": true,
+      "details": "avgMaxDD: 0.519 (51.9%)",
+      "timestamp": "2026-02-22T14:01:19.323870"
+    },
+    {
+      "test_name": "Focus Pack tailRiskP95 (BTC, 365d)",
+      "passed": true,
+      "details": "tailRiskP95: -0.631 (-63.1%)",
+      "timestamp": "2026-02-22T14:01:19.323903"
+    },
+    {
+      "test_name": "Focus Pack API (BTC, 365d)",
+      "passed": true,
+      "details": "API returns scenario data with drawdown stats",
+      "timestamp": "2026-02-22T14:01:19.323908"
+    },
+    {
+      "test_name": "Horizon Risk Variance",
+      "passed": true,
+      "details": "7d: Vol=CRISIS, Size=0.00 vs 30d: Vol=CRISIS, Size=0.00",
+      "timestamp": "2026-02-22T14:01:19.324621"
+    }
+  ]
+}
