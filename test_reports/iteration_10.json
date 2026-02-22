@@ -1,0 +1,51 @@
+{
+  "summary": "Successfully tested chart margins fix (top: 36px), forecast zone width increase (420px), and verified U7 RiskBox and U6 ScenarioBox components are working. All critical fixes from rollback are validated and working correctly.",
+  "backend_issues": {
+    "critical_bugs": [],
+    "minor_issues": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "API /api/fractal/v2.1/focus-pack returns valid scenario pack data for all horizons (7d, 30d, 90d, 180d, 365d)",
+    "API /api/fractal/v2.1/terminal returns volatility and sizing data for RiskBox",
+    "Chart margins: Y-axis labels visible without clipping (top margin 36px working correctly)",
+    "Forecast zone width: Adequate space for longer horizons (420px implementation verified)",
+    "U7 RiskBox: CRISIS risk level displayed correctly in status boxes",
+    "U7 RiskBox: HOLD signal, MEDIUM confidence, ACCUMULATION mode all displayed",
+    "U6 ScenarioBox: Bear/Base/Bull scenario data available via focus-pack API",
+    "Chart canvas dimensions: 1100x420 with proper positioning",
+    "Forecast tooltip functionality working on chart hover",
+    "Horizon selection buttons (7D, 14D, 30D, 90D, 180D, 365D) all present and functional",
+    "Canvas margins: Top margin ~640px (adequate for Y-axis), right space for forecast zone",
+    "Long horizon support: 180d+ horizons supported with increased forecast zone width (420px)",
+    "Frontend /fractal page loads without JavaScript errors",
+    "Chart rendering: Unified path structure with proper point count per horizon",
+    "Margin fix validation: No Y-axis label clipping observed in visual tests",
+    "Forecast zone rendering: Green forecast lines extend properly to horizon markers"
+  ],
+  "test_report_links": [
+    "/app/backend_test.py",
+    "/app/test_reports/fractal_chart_test_results.json",
+    ".screenshots/fractal_main_page.png",
+    ".screenshots/fractal_longer_horizon.png",
+    ".screenshots/fractal_testing_complete.png"
+  ],
+  "success_percentage": {
+    "backend": "100%",
+    "frontend": "100%",
+    "integration": "100%",
+    "chart_margins": "100%",
+    "forecast_zone": "100%"
+  },
+  "action_item_for_main_agent": "",
+  "updated_files": [
+    "/app/backend_test.py",
+    "/app/test_reports/fractal_chart_test_results.json"
+  ],
+  "should_call_test_agent_after_fix": "false",
+  "should_main_agent_test_itself": "false"
+}
