@@ -132,6 +132,11 @@ async function main() {
   await registerLifecycleRoutes(app);
   console.log('[Fractal] ✅ Lifecycle L1 registered at /api/lifecycle/*');
   
+  // BLOCK L4.1: Register Daily Run Orchestrator
+  console.log('[Fractal] Registering Daily Run Orchestrator...');
+  await registerDailyRunRoutes(app);
+  console.log('[Fractal] ✅ Daily Run L4.1 registered at /api/ops/daily-run/*');
+  
   // NOTE: SPX Phase routes already registered via spx-core module
   
   // BLOCK C: Register Combined Terminal (Building)
