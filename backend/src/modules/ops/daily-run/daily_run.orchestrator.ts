@@ -1,8 +1,9 @@
 /**
- * L4.1 — Daily Run Orchestrator
+ * L4.1 + L4.2 — Daily Run Orchestrator
  * 
  * Single orchestrator for daily pipeline.
  * Runs steps in strict order, captures lifecycle before/after.
+ * L4.2: Auto Warmup Starter for PROD mode.
  */
 
 import { Db } from 'mongodb';
@@ -23,6 +24,7 @@ import {
   runWarmupProgressWrite,
   runAutoPromote,
   runIntegrityGuard,
+  runAutoWarmupStarter,
 } from './daily_run.lifecycle.js';
 
 // ═══════════════════════════════════════════════════════════════
