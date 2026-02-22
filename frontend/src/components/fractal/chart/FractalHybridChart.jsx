@@ -525,6 +525,22 @@ const styles = {
     fontWeight: 700,
     fontFamily: 'monospace',
   },
+  // U4: Price target style
+  priceTarget: {
+    fontSize: 13,
+    fontWeight: 600,
+    fontFamily: 'monospace',
+    color: '#555',
+    marginTop: 2,
+    marginBottom: 4,
+  },
+  // U4: Current price in header
+  currentPrice: {
+    fontSize: 10,
+    color: '#666',
+    fontFamily: 'monospace',
+    marginLeft: 8,
+  },
   label: {
     fontSize: 10,
     color: '#888',
