@@ -133,19 +133,9 @@ class FractalChartTester:
                 
             data = response.json()
             
-            if not data.get("ok", False):
-                self.log_test(
-                    f"Terminal API for RiskBox ({focus})", 
-                    False, 
-                    f"API returned ok=false, error: {data.get('error', 'Unknown error')}"
-                )
-                return None
-                
-            terminal = data.get("terminal", {})
-            
-            # Check for RiskBox required fields
-            volatility = terminal.get("volatility")
-            sizing = terminal.get("sizing")
+            # Terminal API returns data directly without "ok" field
+            volatility = data.get("volatility")
+            sizing = data.get("sizing") or data.get("decisionKernel", {}).get("sizing")
             
             if not volatility:
                 self.log_test(
