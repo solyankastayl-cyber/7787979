@@ -85,15 +85,18 @@ export class UnifiedLifecycleService {
   ): Promise<ModelLifecycleState> {
     const now = new Date().toISOString();
     
+    // Remove modelId from update to avoid conflict with $setOnInsert
+    const { modelId: _, ...updateWithoutId } = update as any;
+    
     const result = await this.stateCollection.findOneAndUpdate(
       { modelId },
       {
         $set: {
-          ...update,
-          modelId,
+          ...updateWithoutId,
           updatedAt: now,
         },
         $setOnInsert: {
+          modelId,
           ...createDefaultState(modelId),
           createdAt: now,
         },
