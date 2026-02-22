@@ -223,6 +223,17 @@ export async function buildFocusPack(
     normalizedSeries.mode
   );
   
+  // U6: Build scenario pack for frontend
+  const scenario = buildScenarioPack(
+    overlay,
+    currentPrice,
+    cfg.aftermathDays,
+    focus,
+    asOf,
+    unifiedPath,
+    primarySelection?.primaryMatch
+  );
+  
   return { 
     meta, 
     overlay, 
@@ -234,7 +245,9 @@ export async function buildFocusPack(
     // BLOCK 73.3: Include unified path for frontend
     unifiedPath,
     // BLOCK 73.5.2: Phase filter info
-    phaseFilter 
+    phaseFilter,
+    // U6: Scenario pack
+    scenario
   };
 }
 
