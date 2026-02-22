@@ -29,6 +29,9 @@ import {
   DivergenceMetrics,
   AxisMode,
   getFocusTier,
+  ScenarioPack,
+  ScenarioCase,
+  ScenarioModel,
 } from './focus.types.js';
 import { selectPrimaryMatch } from '../match/primary-selector.service.js';
 import { calculateDivergence } from '../engine/divergence.service.js';
