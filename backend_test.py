@@ -193,8 +193,9 @@ class FractalAPITester:
         )
         
         if success and data:
-            forecast = data.get('forecast', {})
-            primary_match = data.get('primarySelection', {}).get('primaryMatch', {})
+            focus_pack = data.get('focusPack', data)
+            forecast = focus_pack.get('forecast', {})
+            primary_match = focus_pack.get('primarySelection', {}).get('primaryMatch', {})
             
             # Check forecast path for synthetic prices
             price_path = forecast.get('path', []) or forecast.get('pricePath', [])
