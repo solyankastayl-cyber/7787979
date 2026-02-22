@@ -50,6 +50,7 @@ const ASSET_INFO = {
 // Tabs for BTC
 const BTC_TABS = [
   { id: 'overview', label: 'Overview' },
+  { id: 'lifecycle', label: 'Lifecycle' },
   { id: 'shadow', label: 'Shadow Divergence' },
   { id: 'volatility', label: 'Volatility' },
   { id: 'alerts', label: 'Alerts' },
@@ -64,6 +65,7 @@ const BTC_TABS = [
 // Tabs for SPX (Data Foundation + Attribution + Calibration + Drift + Rules + Crisis + Decade + Regimes + Constitution + Governance)
 const SPX_TABS = [
   { id: 'data', label: 'Data Foundation' },
+  { id: 'lifecycle', label: 'Lifecycle' },
   { id: 'spx_attribution', label: 'Attribution' },
   { id: 'spx_calibration', label: 'Calibration' },
   { id: 'spx_drift', label: 'Drift' },
