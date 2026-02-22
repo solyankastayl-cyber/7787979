@@ -84,8 +84,10 @@ class FractalAPITester:
         
         if success_7d and success_365d:
             # Check if responses have different matches
-            matches_7d = data_7d.get('overlay', {}).get('matches', [])
-            matches_365d = data_365d.get('overlay', {}).get('matches', [])
+            focus_pack_7d = data_7d.get('focusPack', data_7d)
+            focus_pack_365d = data_365d.get('focusPack', data_365d)
+            matches_7d = focus_pack_7d.get('overlay', {}).get('matches', [])
+            matches_365d = focus_pack_365d.get('overlay', {}).get('matches', [])
             
             if len(matches_7d) > 0 and len(matches_365d) > 0:
                 # Compare first match IDs to see if they're different
