@@ -85,23 +85,32 @@ export class UnifiedLifecycleService {
   ): Promise<ModelLifecycleState> {
     const now = new Date().toISOString();
     
-    // Remove modelId from update to avoid conflict with $setOnInsert
-    const { modelId: _, ...updateWithoutId } = update as any;
+    // Check if document exists first
+    const existing = await this.stateCollection.findOne({ modelId });
     
+    if (!existing) {
+      // Create new document
+      const newDoc = {
+        ...createDefaultState(modelId),
+        ...update,
+        modelId,
+        createdAt: now,
+        updatedAt: now,
+      };
+      await this.stateCollection.insertOne(newDoc);
+      return newDoc as unknown as ModelLifecycleState;
+    }
+    
+    // Update existing document
     const result = await this.stateCollection.findOneAndUpdate(
       { modelId },
       {
         $set: {
-          ...updateWithoutId,
+          ...update,
           updatedAt: now,
         },
-        $setOnInsert: {
-          modelId,
-          ...createDefaultState(modelId),
-          createdAt: now,
-        },
       },
-      { upsert: true, returnDocument: 'after' }
+      { returnDocument: 'after' }
     );
     
     return result as unknown as ModelLifecycleState;
