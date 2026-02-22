@@ -438,6 +438,13 @@ const FractalTerminal = () => {
             )}
           </div>
 
+          {/* U6: Scenario Box - Expected Outcomes */}
+          {!isLoading && focusData?.scenario && (
+            <div className="mt-6">
+              <ScenarioBox scenario={focusData.scenario} />
+            </div>
+          )}
+
           {/* BLOCK 70.2: Focus-specific panels */}
           {!isLoading && focusData && (
             <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
