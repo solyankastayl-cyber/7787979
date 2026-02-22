@@ -94,21 +94,21 @@ class DailyRunTester:
                     )
                     return None
                 
-                # Validate steps - should be exactly 10
+                # Validate steps - should be exactly 11 (L4.2: added AUTO_WARMUP)
                 steps = result.get('steps', [])
-                if len(steps) != 10:
+                if len(steps) != 11:
                     self.log_result(
                         f"Daily Run Pipeline ({asset})", 
                         False, 
                         response, 
-                        f"Expected 10 steps, got {len(steps)}"
+                        f"Expected 11 steps, got {len(steps)}"
                     )
                     return None
                 
-                # Validate step order and names
+                # Validate step order and names (L4.2: AUTO_WARMUP is step 5)
                 expected_steps = [
                     'SNAPSHOT_WRITE', 'OUTCOME_RESOLVE', 'LIVE_SAMPLE_UPDATE',
-                    'DRIFT_CHECK', 'LIFECYCLE_HOOKS', 'WARMUP_PROGRESS_WRITE',
+                    'DRIFT_CHECK', 'AUTO_WARMUP', 'LIFECYCLE_HOOKS', 'WARMUP_PROGRESS_WRITE',
                     'AUTO_PROMOTE', 'INTEL_TIMELINE_WRITE', 'ALERTS_DISPATCH',
                     'INTEGRITY_GUARD'
                 ]
