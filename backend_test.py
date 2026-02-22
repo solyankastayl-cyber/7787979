@@ -15,24 +15,48 @@ class FractalAPITester:
         self.tests_run = 0
         self.tests_passed = 0
         self.issues = []
-        
-    def log_result(self, test_name, passed, response=None, error=None):
-        """Log test result"""
+    def run_test(self, name, method, endpoint, expected_status, data=None, params=None):
+        """Run a single API test"""
+        url = f"{self.base_url}/{endpoint}"
+        headers = {'Content-Type': 'application/json'}
+        if self.token:
+            headers['Authorization'] = f'Bearer {self.token}'
+
         self.tests_run += 1
-        if passed:
-            self.tests_passed += 1
-            print(f"✅ {test_name}")
-        else:
-            print(f"❌ {test_name}")
-            if error:
-                print(f"   Error: {error}")
-            if response:
-                print(f"   Status: {response.status_code}")
+        print(f"\n🔍 Testing {name}...")
+        print(f"   URL: {url}")
+        if params:
+            print(f"   Params: {params}")
+        
+        try:
+            if method == 'GET':
+                response = requests.get(url, headers=headers, params=params, timeout=30)
+            elif method == 'POST':
+                response = requests.post(url, json=data, headers=headers, timeout=30)
+            else:
+                response = requests.request(method, url, headers=headers, params=params, timeout=30)
+
+            success = response.status_code == expected_status
+            if success:
+                self.tests_passed += 1
+                print(f"✅ Passed - Status: {response.status_code}")
                 try:
-                    print(f"   Response: {response.text[:200]}...")
+                    return True, response.json()
                 except:
-                    pass
-            self.failed_tests.append(test_name)
+                    return True, response.text
+            else:
+                print(f"❌ Failed - Expected {expected_status}, got {response.status_code}")
+                print(f"   Response: {response.text[:200]}...")
+                self.issues.append(f"{name}: Status {response.status_code} (expected {expected_status})")
+                try:
+                    return False, response.json()
+                except:
+                    return False, response.text
+
+        except Exception as e:
+            print(f"❌ Failed - Error: {str(e)}")
+            self.issues.append(f"{name}: {str(e)}")
+            return False, {}
     
     def test_get_lifecycle_state(self):
         """Test GET /api/lifecycle/state"""
