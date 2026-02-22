@@ -204,6 +204,143 @@ class LifecycleAPITester:
             self.log_result(f"POST /api/lifecycle/actions/reset-simulation ({asset})", False, error=str(e))
         return False
     
+    # ═══════════════════════════════════════════════════════════════
+    # L3 SPECIFIC TESTS
+    # ═══════════════════════════════════════════════════════════════
+    
+    def test_constitution_apply(self, asset="BTC", test_hash=None):
+        """Test L3.1: POST /api/lifecycle/constitution/apply"""
+        try:
+            hash_value = test_hash or f"test_hash_{int(datetime.now().timestamp())}"
+            url = f"{self.base_url}/api/lifecycle/constitution/apply"
+            payload = {"asset": asset, "hash": hash_value}
+            response = requests.post(url, json=payload, timeout=30)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('ok'):
+                    result = data.get('data', {})
+                    print(f"   {asset} constitution applied: {result.get('applied', False)}")
+                    print(f"   New status: {result.get('newStatus', 'Unknown')}")
+                    print(f"   Reason: {result.get('reason', 'No reason')}")
+                    self.log_result(f"L3.1 Constitution Apply ({asset})", True)
+                    return result
+                else:
+                    error_msg = data.get('error', 'Unknown error')
+                    self.log_result(f"L3.1 Constitution Apply ({asset})", False, response, error_msg)
+            else:
+                self.log_result(f"L3.1 Constitution Apply ({asset})", False, response)
+        except Exception as e:
+            self.log_result(f"L3.1 Constitution Apply ({asset})", False, error=str(e))
+        return None
+    
+    def test_drift_update(self, asset="BTC", severity="OK"):
+        """Test L3.2: POST /api/lifecycle/drift/update"""
+        try:
+            url = f"{self.base_url}/api/lifecycle/drift/update"
+            payload = {
+                "asset": asset, 
+                "severity": severity,
+                "deltaHitRate": 0.05,
+                "deltaSharpe": 0.1
+            }
+            response = requests.post(url, json=payload, timeout=30)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('ok'):
+                    result = data.get('data', {})
+                    print(f"   {asset} drift updated to {severity}")
+                    print(f"   Updated: {result.get('updated', False)}")
+                    if result.get('revoked'):
+                        print(f"   🚨 AUTO-REVOKED: {result.get('reason', 'Unknown reason')}")
+                    self.log_result(f"L3.2 Drift Update ({asset}, {severity})", True)
+                    return result
+                else:
+                    error_msg = data.get('error', 'Unknown error')
+                    self.log_result(f"L3.2 Drift Update ({asset}, {severity})", False, response, error_msg)
+            else:
+                self.log_result(f"L3.2 Drift Update ({asset}, {severity})", False, response)
+        except Exception as e:
+            self.log_result(f"L3.2 Drift Update ({asset}, {severity})", False, error=str(e))
+        return None
+    
+    def test_samples_increment(self, asset="BTC", count=1):
+        """Test L3.5: POST /api/lifecycle/samples/increment"""
+        try:
+            url = f"{self.base_url}/api/lifecycle/samples/increment"
+            payload = {"asset": asset, "count": count}
+            response = requests.post(url, json=payload, timeout=30)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('ok'):
+                    result = data.get('data', {})
+                    print(f"   {asset} live samples: {result.get('liveSamples', 0)}")
+                    if result.get('promoted'):
+                        print(f"   🎉 AUTO-PROMOTED to APPLIED!")
+                    self.log_result(f"L3.5 Samples Increment ({asset}, +{count})", True)
+                    return result
+                else:
+                    error_msg = data.get('error', 'Unknown error')
+                    self.log_result(f"L3.5 Samples Increment ({asset}, +{count})", False, response, error_msg)
+            else:
+                self.log_result(f"L3.5 Samples Increment ({asset}, +{count})", False, response)
+        except Exception as e:
+            self.log_result(f"L3.5 Samples Increment ({asset}, +{count})", False, error=str(e))
+        return None
+    
+    def test_integrity_check(self, asset="BTC"):
+        """Test L3.4: POST /api/lifecycle/integrity/check"""
+        try:
+            url = f"{self.base_url}/api/lifecycle/integrity/check"
+            payload = {"asset": asset}
+            response = requests.post(url, json=payload, timeout=30)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('ok'):
+                    result = data.get('data', {})
+                    integrity = result.get('integrityResult', {})
+                    print(f"   {asset} integrity valid: {integrity.get('valid', 'Unknown')}")
+                    if integrity.get('fixes'):
+                        print(f"   Fixes applied: {', '.join(integrity.get('fixes', []))}")
+                    self.log_result(f"L3.4 Integrity Check ({asset})", True)
+                    return result
+                else:
+                    error_msg = data.get('error', 'Unknown error')
+                    self.log_result(f"L3.4 Integrity Check ({asset})", False, response, error_msg)
+            else:
+                self.log_result(f"L3.4 Integrity Check ({asset})", False, response)
+        except Exception as e:
+            self.log_result(f"L3.4 Integrity Check ({asset})", False, error=str(e))
+        return None
+    
+    def test_check_promotion(self, asset="BTC"):
+        """Test L3.5: POST /api/lifecycle/check-promotion"""
+        try:
+            url = f"{self.base_url}/api/lifecycle/check-promotion"
+            payload = {"asset": asset}
+            response = requests.post(url, json=payload, timeout=30)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('ok'):
+                    result = data.get('data', {})
+                    print(f"   {asset} promotion check - promoted: {result.get('promoted', False)}")
+                    print(f"   Blocked: {result.get('blocked', False)}")
+                    print(f"   Reason: {result.get('reason', 'No reason')}")
+                    self.log_result(f"L3.5 Check Promotion ({asset})", True)
+                    return result
+                else:
+                    error_msg = data.get('error', 'Unknown error')
+                    self.log_result(f"L3.5 Check Promotion ({asset})", False, response, error_msg)
+            else:
+                self.log_result(f"L3.5 Check Promotion ({asset})", False, response)
+        except Exception as e:
+            self.log_result(f"L3.5 Check Promotion ({asset})", False, error=str(e))
+        return None
+    
     def test_model_status(self, model_id="BTC"):
         """Test GET /api/lifecycle/{modelId}/status"""
         try:
