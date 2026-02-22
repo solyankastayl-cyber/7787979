@@ -1,6 +1,7 @@
 """
-Backend API Testing for Fractal Module U3, U4, U5 Features
-Tests the /api/fractal/v2.1/focus-pack endpoint with different horizons
+Backend API Testing for Fractal Module U6 Features
+Tests the U6 Scenarios 2.0 implementation including ScenarioBox component
+and backend scenario pack generation from focus-pack endpoint
 """
 
 import requests
