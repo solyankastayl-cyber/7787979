@@ -1,6 +1,6 @@
 """
-Backend API Testing for Fractal Lifecycle Functionality
-Tests for L2 Lifecycle UI + Diagnostics endpoints
+Backend API Testing for Fractal Module U3, U4, U5 Features
+Tests the /api/fractal/v2.1/focus-pack endpoint with different horizons
 """
 
 import requests
@@ -8,12 +8,13 @@ import json
 import sys
 from datetime import datetime
 
-class LifecycleAPITester:
-    def __init__(self, base_url="https://fractal-module-fix.preview.emergentagent.com"):
+class FractalAPITester:
+    def __init__(self, base_url="https://fractal-dev-3.preview.emergentagent.com"):
         self.base_url = base_url
+        self.token = None
         self.tests_run = 0
         self.tests_passed = 0
-        self.failed_tests = []
+        self.issues = []
         
     def log_result(self, test_name, passed, response=None, error=None):
         """Log test result"""
