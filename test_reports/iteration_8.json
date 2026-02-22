@@ -1,0 +1,46 @@
+{
+  "summary": "U6 Scenarios 2.0 implementation testing completed successfully - backend scenario pack generation and frontend ScenarioBox component rendering Bear/Base/Bull scenarios with real data",
+  "backend_issues": {
+    "critical_bugs": [],
+    "minor_issues": [
+      {
+        "endpoint": "/api/fractal/v2.1/terminal",
+        "issue": "Missing phaseSnapshot data for Market Mode card",
+        "impact": "One signal header card shows as unavailable",
+        "fix_priority": "LOW"
+      }
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "passed_tests": [
+    "U6: GET /api/fractal/v2.1/focus-pack returns complete scenario object with horizonDays, basePrice, returns, targets, probUp, sampleSize",
+    "U6: Scenario targets are different for 7d vs 365d horizons ($74K vs $595K for P90)",
+    "U6: ScenarioBox component renders Bear/Base/Bull cards with prices and return percentages",
+    "U6: RangeStrip shows P10-P90 range visualization",
+    "U6: OutcomeStats displays probUp (65%), avgMaxDD (16.7%), tailRiskP95 (-29.8%), sampleSize (20)",
+    "U6: dataStatus shows REAL when sampleSize (20) >= 5",
+    "Frontend /fractal page loads and displays ScenarioBox component successfully",
+    "Backend API returns proper nested focusPack structure with scenario data",
+    "Different focus horizons return different scenario calculations",
+    "All scenario cards show target prices and return percentages correctly"
+  ],
+  "test_report_links": [
+    "/app/backend_test.py",
+    ".screenshots/u6_scenario_box_final.png"
+  ],
+  "success_percentage": {
+    "backend": "95%",
+    "frontend": "100%",
+    "integration": "100%"
+  },
+  "action_item_for_main_agent": "",
+  "updated_files": [
+    "/app/backend_test.py"
+  ],
+  "should_call_test_agent_after_fix": "false",
+  "should_main_agent_test_itself": "true"
+}
